@@ -51,6 +51,8 @@ struct sInsuranceClaim
 {
 	sCar st_car; //the car that was damaged or stolen
 	claimtype claim_type; //either stolen or damaged
+	sDate st_claimRaiseDate; //when the customer files the claim
+	sDate st_claimTypeDate; //date of the event, i.e. when the car was stolen or damaged
 
 };
 
