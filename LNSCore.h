@@ -5,6 +5,13 @@
 //This file contains core data structures and maybe functions that the application requires
 //Each struct is defined and populated with the date it requires
 
+struct sDate
+{
+	int day;
+	int month;
+	int year;
+};
+
 struct sAddress
 {
 	
@@ -42,6 +49,7 @@ struct sInsuranceClaim
 {
 	sCar st_car; //the car that was damaged or stolen
 	claimtype claim_type; //either stolen or damaged
+
 };
 
 struct sPolicy
