@@ -1,7 +1,9 @@
 #ifndef LNSCORE_H
 #define LNSCORE_H
 
-#include<stream>
+#include <string>
+using namespace std;
+
 //This file contains core data structures and maybe functions that the application requires
 //Each struct is defined and populated with the date it requires
 
