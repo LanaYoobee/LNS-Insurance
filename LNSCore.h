@@ -1,6 +1,7 @@
 #ifndef LNSCORE_H
 #define LNSCORE_H
 
+#include<stream>
 //This file contains core data structures and maybe functions that the application requires
 //Each struct is defined and populated with the date it requires
 
@@ -29,9 +30,18 @@ struct sCar
 
 };
 
+//enumerated type - claim can be either a stolen car or damaged car (which is everything other than stolen) and a default "noclaim"
+enum claimtype 
+{
+	noclaim,
+	stolen, 
+	damgaged
+};
+
 struct sInsuranceClaim
 {
-
+	sCar st_car; //the car that was damaged or stolen
+	claimtype claim_type; //either stolen or damaged
 };
 
 struct sPolicy
