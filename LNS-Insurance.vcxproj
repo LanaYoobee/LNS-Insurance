@@ -129,6 +129,9 @@
   <ItemGroup>
     <ClCompile Include="LNS-Insurance.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="LNSCore.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
