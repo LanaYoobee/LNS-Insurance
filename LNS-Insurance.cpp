@@ -13,12 +13,10 @@ struct Account {
     string username;
     string password;
 
-    //constructor to initialize the variables of the structure
-    //you can provide a default value to your variables
+    //constructor to initialize the variables of the struct
     Account(string u = "user1", string p = "pass1") {
         username = u;
         password = p;
-
     }
 };
 
@@ -30,6 +28,7 @@ void displayLoggedInMenu();
 void loggedInFunctions();
 Account inputAccount(Account& account);
 void writeToFile(Account);
+bool checkPassValidity(string p);
 vector <Account> readFromFile();
 void login(vector<Account>&);
 void forgot();
@@ -176,10 +175,19 @@ Account inputAccount(Account& account) {
     cout << "Creating a new account." << endl;
     cout << "Please enter a user name: ";
     cin >> account.username;
-    cout << "Please enter a password: ";
-    cin >> account.password;
-    cout << "User " << account.username << " created." << endl;
+
+	cout << "Please create a password. The password must be at least eight characters long and contain one upper case and one lower case letter: ";
+	cin >> account.password;
+    
+	while (checkPassValidity(account.password) == false) //validating for password strength requirements
+	{
+		cout << "Please enter a new password: ";
+		cin >> account.password;
+	}
+
+	cout << "User " << account.username << " created." << endl;
 	displayLoggedInMenu();
+
     return (account);
 }
 
@@ -252,6 +260,7 @@ void login(vector<Account>& accountFromFile) {
 			else 
 			{
 				cout << "Log in attempts exceeded. Forgot password?" << endl;
+				forgot();
 			}
 		}
 	}
@@ -261,4 +270,28 @@ void login(vector<Account>& accountFromFile) {
 void forgot()
 {
 
+}
+
+//checks for password strength requirements
+bool checkPassValidity(string p) 
+{
+	int i_length = p.length();
+	int i_lowerCount = 0, i_upperCount = 0;
+
+	for (int i = 0; i < i_length; i++)
+		{
+			if (isupper(p[i]))
+				i_upperCount++;
+			if (islower(p[i]))
+				i_lowerCount++;
+		}
+		if (i_length >= 8 && i_lowerCount >= 1 && i_upperCount >= 1)
+			return true;
+		if (i_length < 8)
+			cout << "The password length must be at least eight characters." << endl;
+		if (i_lowerCount < 1)
+			cout << "The password must contain at least one lower case character." << endl;
+		if (i_upperCount < 1)
+			cout << "The password must contain at least one upper case character." << endl;
+return false;
 }
