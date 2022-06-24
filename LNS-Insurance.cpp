@@ -3,16 +3,36 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <sstream> 
+#include <vector> 
 using namespace std;
+
+/// Structs
+struct Account {
+    string username;
+    string password;
+
+    //constructor to initialize the variables of the structure
+    //you can provide a default value to your variables
+    Account(string u = "user1", string p = "pass1") {
+        username = u;
+        password = p;
+
+    }
+};
 
 /// Function prototypes
 void runProgram();
 void displayMainMenu();
 void displayAbout();
 void displayLoggedInMenu();
-void login();
-void newUserRegistration();
+Account inputAccount(Account& account);
+void writeToFile(Account);
+vector <Account> readFromFile();
+void login(vector<Account>&);
 void forgot();
+
 
 
 //main function
@@ -33,17 +53,21 @@ Select an option from the menu below
 //main program operation
 void runProgram() {
 	int i_menuSelection = 0;
+    Account account;//data from the user
+    vector <Account>accountFromFile;//data from the file
 
-	do //application continues until the user requests to exit
+    do //application continues until the user requests to exit
 	{
 		if (cin >> i_menuSelection)
 		{
 			switch (i_menuSelection) {
 			case 1:
-				login();
+                accountFromFile = readFromFile();
+                login(accountFromFile);
 				break;
 			case 2:
-				newUserRegistration();
+                inputAccount(account);
+                writeToFile(account);
 				break;
 			case 3:
 				displayAbout();
@@ -100,50 +124,78 @@ void displayLoggedInMenu()
 	cout << "4. Submit a claim" << endl;
 }
 
-void login()
-{
-	string s_enteredUserID, s_enteredPassword, s_fileUserID, s_filerUserPassword;
-	cout << "Please enter a user name:" << endl;
-	cin >> s_enteredUserID;
-	cout << "Please enter your password:" << endl;
-	cin >> s_enteredPassword;
-	
-	ifstream loginDetails;
-	loginDetails.open("loginDetails.csv", ios::in);
-
-	if (loginDetails.is_open())
-	{
-		while (loginDetails >> s_fileUserID >> s_filerUserPassword)
-		{
-			if (s_fileUserID == s_enteredUserID && s_filerUserPassword == s_enteredPassword)
-			{
-				cout << s_enteredUserID << " successfully logged in" << endl;
-				displayLoggedInMenu();
-			}
-			else
-			{
-				cout << "Incorrect Login" << endl;
-				displayMainMenu();
-			}
-		}
-	}
-	loginDetails.close();	
+//inputAccount to take user input
+Account inputAccount(Account& account) {
+    cout << "Creating a new account." << endl;
+    cout << "Please enter a user name: ";
+    cin >> account.username;
+    cout << "Please enter a password: ";
+    cin >> account.password;
+    cout << "User " << account.username << " created.";
+    return (account);
 }
 
-void newUserRegistration()
-{
-	string s_enteredUserID, s_enteredPassword;
-	cout << "Creating a new user account" << endl;
-	cout << "Please enter a user name:" << endl;
-	cin >> s_enteredUserID;
-	cout << "Please enter your password:" << endl;
-	cin >> s_enteredPassword;
+//writeToFile function facilitates the storing of account details
+void writeToFile(Account account) {
 
-	ofstream loginDetails;
-	loginDetails.open("loginDetails.csv", ios::app); //write to the csv file
-	loginDetails << s_enteredUserID << ',' << s_enteredPassword << endl;
-	cout << "Created a new user " << s_enteredUserID << endl;
-	displayMainMenu();
+    fstream loginDetails("loginDetails.csv", ios::app);
+    loginDetails << account.username << "," << account.password << endl;
+    loginDetails.close();
+
+}
+
+//readFromFile function to read data from the loginDetails.csv
+vector <Account> readFromFile() {
+
+    fstream loginDetails("loginDetails.csv", ios::in);
+    vector<Account> tempAccount;
+
+    Account a;
+    string line;
+    while (getline(loginDetails, line)) {
+
+        istringstream linestream(line);//to split the row into columns/properties
+        string item;
+        //until the appearance of comma, everything is stored in item
+        getline(linestream, item, ',');
+        a.username = item;
+
+        getline(linestream, item, ',');
+        a.password = item;
+
+        tempAccount.push_back(a);
+
+    }
+
+    loginDetails.close();
+    return(tempAccount);
+}
+
+//login function to search for the username and password
+void login(vector<Account>& accountFromFile) {
+
+    int i_loggedIn = 0;
+    //get the username and password from the user to login
+    string uname, upassword;
+    cout << "Enter user name: ";
+    cin >> uname;
+    cout << "Enter password: ";
+    cin >> upassword;
+
+    for (int i = 0; i < accountFromFile.size(); i++) 
+    {
+        if (accountFromFile[i].username == uname && accountFromFile[i].password == upassword)
+        {
+            cout << uname << " logged in" << endl;
+            displayLoggedInMenu();
+            i_loggedIn = 1;
+        }
+    }
+    if (i_loggedIn != 1)
+    {
+        cout << "Invalid user name or password" << endl << endl;
+        displayMainMenu();
+    }
 }
 
 void forgot()
