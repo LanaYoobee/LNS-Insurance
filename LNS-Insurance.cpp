@@ -27,6 +27,7 @@ void runProgram();
 void displayMainMenu();
 void displayAbout();
 void displayLoggedInMenu();
+void loggedInFunctions();
 Account inputAccount(Account& account);
 void writeToFile(Account);
 vector <Account> readFromFile();
@@ -122,6 +123,52 @@ void displayLoggedInMenu()
 	cout << "2. Show car details" << endl;
 	cout << "3. Available policies" << endl;
 	cout << "4. Submit a claim" << endl;
+	cout << "5. Go back to the main menu" << endl;
+	loggedInFunctions();
+}
+
+void loggedInFunctions() 
+{
+	int i_menuSelection = 0;
+
+	do 
+	{
+	if (cin >> i_menuSelection)
+		{
+			switch (i_menuSelection) {
+			case 1:
+				cout << "Insurer details" << endl;
+				break;
+			case 2:
+				cout << "Car details" << endl;
+				break;
+			case 3:
+				cout << "Available policies" << endl;
+				break;
+			case 4: 
+				cout << "Submit a claim" << endl;
+				break;
+			case 5: 
+				cout << "Going back to the main menu" << endl;
+				displayMainMenu();
+				break;
+			default: //validation for other numbers
+				cout << "Invalid selection." << endl;
+				cout << "Please enter one of the five numbers" << endl;
+				displayLoggedInMenu();
+				break;
+			}
+		}
+		else //validation for non numeric input
+		{
+			cout << "Invalid selection." << endl;
+			cout << "Please select one of the five numbers" << endl;
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			displayLoggedInMenu();
+		}
+
+	} while (i_menuSelection != 5); //monitoring for request to return to the main menu
 }
 
 //inputAccount to take user input
@@ -131,7 +178,8 @@ Account inputAccount(Account& account) {
     cin >> account.username;
     cout << "Please enter a password: ";
     cin >> account.password;
-    cout << "User " << account.username << " created.";
+    cout << "User " << account.username << " created." << endl;
+	displayLoggedInMenu();
     return (account);
 }
 
@@ -164,9 +212,7 @@ vector <Account> readFromFile() {
         a.password = item;
 
         tempAccount.push_back(a);
-
     }
-
     loginDetails.close();
     return(tempAccount);
 }
@@ -174,28 +220,42 @@ vector <Account> readFromFile() {
 //login function to search for the username and password
 void login(vector<Account>& accountFromFile) {
 
-    int i_loggedIn = 0;
+    int i_loggedIn = 0, i_attemptCount = 0;
     //get the username and password from the user to login
     string uname, upassword;
-    cout << "Enter user name: ";
-    cin >> uname;
-    cout << "Enter password: ";
-    cin >> upassword;
 
-    for (int i = 0; i < accountFromFile.size(); i++) 
-    {
-        if (accountFromFile[i].username == uname && accountFromFile[i].password == upassword)
-        {
-            cout << uname << " logged in" << endl;
-            displayLoggedInMenu();
-            i_loggedIn = 1;
-        }
-    }
-    if (i_loggedIn != 1)
-    {
-        cout << "Invalid user name or password" << endl << endl;
-        displayMainMenu();
-    }
+	while (i_attemptCount < 3)
+	{
+		cout << "Enter user name: ";
+		cin >> uname;
+		cout << "Enter password: ";
+		cin >> upassword;
+
+		for (int i = 0; i < accountFromFile.size(); i++)
+		{
+			if (accountFromFile[i].username == uname && accountFromFile[i].password == upassword)
+			{
+				cout << uname << " logged in" << endl;
+				displayLoggedInMenu();
+				i_loggedIn = 1;
+			}
+		}
+		if (i_loggedIn != 1)
+		{
+			i_attemptCount++;
+
+			if (i_attemptCount <= 2) 
+			{
+				cout << "Invalid user name or password." << endl;
+				cout << "Please try again." << endl;
+			}
+			else 
+			{
+				cout << "Log in attempts exceeded. Forgot password?" << endl;
+			}
+		}
+	}
+	displayMainMenu();
 }
 
 void forgot()
