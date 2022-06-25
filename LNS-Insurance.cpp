@@ -90,7 +90,7 @@ void runProgram()
 
 			case 4:
 			{
-				b_runProgram = false;
+				b_runProgram = false; //false so let's get out of here
 				break;
 			}
 
