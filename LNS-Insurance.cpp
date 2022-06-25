@@ -26,12 +26,13 @@ void displayMainMenu();
 void displayAbout();
 void displayLoggedInMenu();
 void loggedInFunctions();
-Account inputAccount(Account& account);
+Account inputAccount(Account&);
 void writeToFile(Account);
-bool checkPassValidity(string p);
+bool checkUserNameExists(string);
+bool checkPassValidity(string);
 vector <Account> readFromFile();
 void login(vector<Account>&);
-void forgot();
+void forgotPassword();
 
 //main function
 int main()
@@ -178,28 +179,52 @@ Account inputAccount(Account& account) {
     cout << "Please enter a user name: ";
     cin >> account.username;
 
-	cout << "Please create a password. The password must be at least eight characters long and contain one upper case and one lower case letter: ";
-	cin >> account.password;
-    
-	while (checkPassValidity(account.password) == false) //validating for password strength requirements
+	while (!checkUserNameExists(account.username))
 	{
-		cout << "Please enter a new password: ";
-		cin >> account.password;
+		cout << "Please enter a user name: ";
+		cin >> account.username;
 	}
 
-	cout << "User " << account.username << " created." << endl;
-	displayLoggedInMenu();
+	while (checkUserNameExists(account.username))
+	{
+		cout << "Please create a password. The password must be at least eight characters long and contain one upper case and one lower case letter: ";
+		cin >> account.password;
 
-    return (account);
+		while (checkPassValidity(account.password) == false) //validating for password strength requirements
+		{
+			cout << "Please enter a new password: ";
+			cin >> account.password;
+		}
+
+		cout << "User " << account.username << " created." << endl;
+		displayLoggedInMenu();
+
+		return (account);
+	}
 }
 
-//writeToFile function facilitates the storing of account details
+//checking that the account already exists
+bool checkUserNameExists(string s_checkUserName)
+{
+	vector <Account>accountFromFile = readFromFile();
+
+	for (int i = 0; i < accountFromFile.size(); i++)
+	{
+		if (accountFromFile[i].username == s_checkUserName)
+		{
+			cout << s_checkUserName << " is already taken. Please pick a different user name." << endl;
+			return false;
+		}
+	}
+	return true;
+}
+
+//writeToFile function to store login details
 void writeToFile(Account account) {
 
     fstream loginDetails("loginDetails.csv", ios::app);
     loginDetails << account.username << "," << account.password << endl;
     loginDetails.close();
-
 }
 
 //readFromFile function to read data from the loginDetails.csv
@@ -255,7 +280,7 @@ void login(vector<Account>& accountFromFile) {
 		{
 			i_attemptCount++;
 
-			if (i_attemptCount <= 2) 
+			if (i_attemptCount < 3) 
 			{
 				cout << "Invalid user name or password." << endl;
 				cout << "Please try again." << endl;
@@ -263,15 +288,19 @@ void login(vector<Account>& accountFromFile) {
 			else 
 			{
 				cout << "Log in attempts exceeded. Forgot password?" << endl;
-				forgot();
+				forgotPassword();
 			}
 		}
 	}
 	displayMainMenu();
 }
 
-void forgot()
+void forgotPassword()
 {
+	string s_userName;
+	cout << "Enter user name to search for the password: ";
+	cin >> s_userName;
+
 
 }
 
