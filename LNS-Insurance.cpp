@@ -25,7 +25,9 @@ void runProgram();
 void displayMainMenu();
 void displayAbout();
 void displayLoggedInMenu();
+void displayAdminMenu();
 void loggedInFunctions();
+void adminFunctions();
 Account inputAccount(Account&);
 void writeToFile(Account);
 bool checkUserNameExists(string);
@@ -112,6 +114,16 @@ void displayAbout()
 Vehicle Insurance System
 Developed by Lana Lankevich and Saadi Radcliffe
 )";
+}
+
+//menu for Admin users - allows managing existing accounts
+void displayAdminMenu()
+{
+	cout << endl << "1. Manage users" << endl;
+	cout << "2. Manage policies" << endl;
+	cout << "3. Manage claims" << endl;
+	cout << "4. Go back to the main menu" << endl;
+	adminFunctions();
 }
 
 //menu visible to people who are logged in
@@ -271,7 +283,10 @@ void login(vector<Account>& accountFromFile) {
 			if (accountFromFile[i].username == s_uname && accountFromFile[i].password == s_upassword)
 			{
 				cout << s_uname << " logged in" << endl;
-				displayLoggedInMenu();
+				if (s_uname == "Admin")
+					displayAdminMenu();
+				else 
+					displayLoggedInMenu();
 				i_loggedIn = 1;
 				return; //we are now logged in so return out of this function
 			}
@@ -295,6 +310,7 @@ void login(vector<Account>& accountFromFile) {
 	displayMainMenu();
 }
 
+//find a password for a given user name
 void forgotPassword()
 {
 	string s_userName;
@@ -302,7 +318,7 @@ void forgotPassword()
 	cin >> s_userName;
 	vector <Account>accountFromFile = readFromFile();
 
-	for (int i = 0; i < accountFromFile.size(); i++)
+	for (int i = 0; i < accountFromFile.size(); i++) //iterate through the file looking for the user
 	{
 		if (accountFromFile[i].username == s_userName)
 		{
@@ -311,7 +327,6 @@ void forgotPassword()
 		}
 	}
 	cout << "No such user name found. Try creating a new user account." << endl;
-	return;
 }
 
 //checks for password strength requirements
@@ -336,4 +351,48 @@ bool checkPassValidity(string p)
 	if (i_upperCount < 1)
 		cout << "The password must contain at least one upper case character." << endl;
 	return false;
+}
+
+void adminFunctions()
+{
+	int i_menuSelection = 0;
+
+	bool b_runLoggedMenu = true;
+
+	while (b_runLoggedMenu)
+	{
+		if (cin >> i_menuSelection)
+		{
+			switch (i_menuSelection)
+			{
+			case 1:
+				cout << "Below is the list of users and their passwords" << endl;
+				break;
+			case 2:
+				cout << "Below is the list of all policies" << endl;
+				break;
+			case 3:
+				cout << "Below is a list of all claims" << endl;
+				break;
+			case 4:
+				cout << "Going back to the main menu" << endl;
+				displayMainMenu();
+				b_runLoggedMenu = false;
+				break;
+			default: //validation for other numbers
+				cout << "Invalid selection." << endl;
+				cout << "Please enter one of the five numbers" << endl;
+				displayAdminMenu();
+				break;
+			}
+		}
+		else //validation for non numeric input
+		{
+			cout << "Invalid selection." << endl;
+			cout << "Please select one of the five numbers" << endl;
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			displayLoggedInMenu();
+		}
+	}
 }
