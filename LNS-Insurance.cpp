@@ -10,14 +10,14 @@ using namespace std;
 
 /// Structs
 struct Account {
-    string username;
-    string password;
+	string username;
+	string password;
 
-    //constructor to initialize the variables of the struct
-    Account(string u = "user1", string p = "pass1") {
-        username = u;
-        password = p;
-    }
+	//constructor to initialize the variables of the struct
+	Account(string u = "user1", string p = "pass1") {
+		username = u;
+		password = p;
+	}
 };
 
 /// Function prototypes
@@ -42,7 +42,7 @@ int main()
 ***********************************************
 Vehicle Insurance System
 Select an option from the menu below
-)" << endl;
+)";
 	runProgram(); //start the application, expecting user input
 }
 
@@ -98,7 +98,7 @@ void runProgram()
 //displays main menu
 void displayMainMenu()
 {
-	cout << "1. Log in" << endl;
+	cout << endl << "1. Log in" << endl;
 	cout << "2. Create new user" << endl;
 	cout << "3. About" << endl;
 	cout << "4. Exit" << endl;
@@ -111,13 +111,13 @@ void displayAbout()
 ***********************************************
 Vehicle Insurance System
 Developed by Lana Lankevich and Saadi Radcliffe
-)" << endl;
+)";
 }
 
 //menu visible to people who are logged in
 void displayLoggedInMenu()
 {
-	cout << "1. Show insurer details" << endl;
+	cout << endl << "1. Show insurer details" << endl;
 	cout << "2. Show car details" << endl;
 	cout << "3. Available policies" << endl;
 	cout << "4. Submit a claim" << endl;
@@ -125,13 +125,13 @@ void displayLoggedInMenu()
 	loggedInFunctions();
 }
 
-void loggedInFunctions() 
+void loggedInFunctions()
 {
 	int i_menuSelection = 0;
 
 	bool b_runLoggedMenu = true;
-	
-	while (b_runLoggedMenu) 
+
+	while (b_runLoggedMenu)
 	{
 		if (cin >> i_menuSelection)
 		{
@@ -169,15 +169,15 @@ void loggedInFunctions()
 			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			displayLoggedInMenu();
 		}
-	} 
+	}
 }
 
 //inputAccount to take user input
 Account inputAccount(Account& account) {
-    cout << "Creating a new account." << endl;
+	cout << "Creating a new account." << endl;
 
-    cout << "Please enter a user name: ";
-    cin >> account.username;
+	cout << "Please enter a user name: ";
+	cin >> account.username;
 
 	while (!checkUserNameExists(account.username))
 	{
@@ -222,42 +222,42 @@ bool checkUserNameExists(string s_checkUserName)
 //writeToFile function to store login details
 void writeToFile(Account account) {
 
-    fstream loginDetails("loginDetails.csv", ios::app);
-    loginDetails << account.username << "," << account.password << endl;
-    loginDetails.close();
+	fstream loginDetails("loginDetails.csv", ios::app);
+	loginDetails << account.username << "," << account.password << endl;
+	loginDetails.close();
 }
 
 //readFromFile function to read data from the loginDetails.csv
 vector <Account> readFromFile() {
 
-    fstream loginDetails("loginDetails.csv", ios::in);
-    vector<Account> tempAccount;
+	fstream loginDetails("loginDetails.csv", ios::in);
+	vector<Account> tempAccount;
 
-    Account a;
-    string line;
-    while (getline(loginDetails, line)) {
+	Account a;
+	string line;
+	while (getline(loginDetails, line)) {
 
-        istringstream linestream(line);//to split the row into columns/properties
-        string item;
-        //until the appearance of comma, everything is stored in item
-        getline(linestream, item, ',');
-        a.username = item;
+		istringstream linestream(line);//to split the row into columns/properties
+		string item;
+		//until the appearance of comma, everything is stored in item
+		getline(linestream, item, ',');
+		a.username = item;
 
-        getline(linestream, item, ',');
-        a.password = item;
+		getline(linestream, item, ',');
+		a.password = item;
 
-        tempAccount.push_back(a);
-    }
-    loginDetails.close();
-    return(tempAccount);
+		tempAccount.push_back(a);
+	}
+	loginDetails.close();
+	return(tempAccount);
 }
 
 //login function to search for the username and password
 void login(vector<Account>& accountFromFile) {
 
-    int i_loggedIn = 0, i_attemptCount = 0;
-    //get the username and password from the user to login
-    string s_uname, s_upassword;
+	int i_loggedIn = 0, i_attemptCount = 0;
+	//get the username and password from the user to login
+	string s_uname, s_upassword;
 
 	while (i_attemptCount < 3 && (i_loggedIn == 0))
 	{
@@ -280,14 +280,14 @@ void login(vector<Account>& accountFromFile) {
 		{
 			i_attemptCount++;
 
-			if (i_attemptCount < 3) 
+			if (i_attemptCount < 3)
 			{
 				cout << "Invalid user name or password." << endl;
 				cout << "Please try again." << endl;
 			}
-			else 
+			else
 			{
-				cout << "Log in attempts exceeded. Forgot password?" << endl;
+				cout << "Log in attempts exceeded." << endl;
 				forgotPassword();
 			}
 		}
@@ -298,32 +298,42 @@ void login(vector<Account>& accountFromFile) {
 void forgotPassword()
 {
 	string s_userName;
-	cout << "Enter user name to search for the password: ";
+	cout << "Forgot your password? Enter your user name to search for the password: ";
 	cin >> s_userName;
+	vector <Account>accountFromFile = readFromFile();
 
-
+	for (int i = 0; i < accountFromFile.size(); i++)
+	{
+		if (accountFromFile[i].username == s_userName)
+		{
+			cout << "User " << s_userName << " exists. Your password is " << accountFromFile[i].password << endl;
+			return;
+		}
+	}
+	cout << "No such user name found. Try creating a new user account." << endl;
+	return;
 }
 
 //checks for password strength requirements
-bool checkPassValidity(string p) 
+bool checkPassValidity(string p)
 {
 	int i_length = p.length();
 	int i_lowerCount = 0, i_upperCount = 0;
 
 	for (int i = 0; i < i_length; i++)
-		{
-			if (isupper(p[i]))
-				i_upperCount++;
-			if (islower(p[i]))
-				i_lowerCount++;
-		}
-		if (i_length >= 8 && i_lowerCount >= 1 && i_upperCount >= 1)
-			return true;
-		if (i_length < 8)
-			cout << "The password length must be at least eight characters." << endl;
-		if (i_lowerCount < 1)
-			cout << "The password must contain at least one lower case character." << endl;
-		if (i_upperCount < 1)
-			cout << "The password must contain at least one upper case character." << endl;
-return false;
+	{
+		if (isupper(p[i]))
+			i_upperCount++;
+		if (islower(p[i]))
+			i_lowerCount++;
+	}
+	if (i_length >= 8 && i_lowerCount >= 1 && i_upperCount >= 1)
+		return true;
+	if (i_length < 8)
+		cout << "The password length must be at least eight characters." << endl;
+	if (i_lowerCount < 1)
+		cout << "The password must contain at least one lower case character." << endl;
+	if (i_upperCount < 1)
+		cout << "The password must contain at least one upper case character." << endl;
+	return false;
 }
