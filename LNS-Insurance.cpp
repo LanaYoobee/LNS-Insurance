@@ -33,8 +33,6 @@ vector <Account> readFromFile();
 void login(vector<Account>&);
 void forgot();
 
-
-
 //main function
 int main()
 {
@@ -44,11 +42,8 @@ int main()
 Vehicle Insurance System
 Select an option from the menu below
 )" << endl;
-
-	
 	runProgram(); //start the application, expecting user input
 }
-
 
 //main program operation
 void runProgram()
@@ -61,48 +56,31 @@ void runProgram()
 
 	while (b_runProgram)
 	{
-		
-
 		if (cin >> i_menuSelection)
 		{
 			switch (i_menuSelection)
 			{
 			case 1:
-			{
 				accountFromFile = readFromFile();
 				login(accountFromFile);
 				break;
-			}
-
 			case 2:
-			{
 				inputAccount(account);
 				writeToFile(account);
 				break;
-			}
-
 			case 3:
-			{
 				displayAbout();
 				displayMainMenu();
 				break;
-			}
-
 			case 4:
-			{
 				b_runProgram = false; //false so let's get out of here
 				break;
-			}
-
 			default:
-			{
 				cout << "Invalid selection." << endl;
 				cout << "Please enter one of the four numbers" << endl;
 				displayMainMenu();
 				break;
 			}
-			}
-
 		}
 		else
 		{
@@ -112,11 +90,8 @@ void runProgram()
 			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			displayMainMenu();
 		}
-		
-
 	}
 	cout << "Exiting application. Goodbye." << endl; //exit message
-
 }
 
 //displays main menu
@@ -159,49 +134,47 @@ void loggedInFunctions()
 	{
 		if (cin >> i_menuSelection)
 		{
+			switch (i_menuSelection)
 			{
-				switch (i_menuSelection) {
-				case 1:
-					cout << "Insurer details" << endl;
-					break;
-				case 2:
-					cout << "Car details" << endl;
-					break;
-				case 3:
-					cout << "Available policies" << endl;
-					break;
-				case 4:
-					cout << "Submit a claim" << endl;
-					break;
-				case 5:
-					cout << "Going back to the main menu" << endl;
-					displayMainMenu();
-					b_runLoggedMenu = false;
-					break;
-				default: //validation for other numbers
-					cout << "Invalid selection." << endl;
-					cout << "Please enter one of the five numbers" << endl;
-					displayLoggedInMenu();
-					break;
-				}
+			case 1:
+				cout << "Insurer details" << endl;
+				break;
+			case 2:
+				cout << "Car details" << endl;
+				break;
+			case 3:
+				cout << "Available policies" << endl;
+				break;
+			case 4:
+				cout << "Submit a claim" << endl;
+				break;
+			case 5:
+				cout << "Going back to the main menu" << endl;
+				displayMainMenu();
+				b_runLoggedMenu = false;
+				break;
+			default: //validation for other numbers
+				cout << "Invalid selection." << endl;
+				cout << "Please enter one of the five numbers" << endl;
+				displayLoggedInMenu();
+				break;
 			}
-
 		}
 		else //validation for non numeric input
-			{
-				cout << "Invalid selection." << endl;
-				cout << "Please select one of the five numbers" << endl;
-				cin.clear();
-				cin.ignore(numeric_limits<streamsize>::max(), '\n');
-				displayLoggedInMenu();
-			}
-
-	} //monitoring for request to return to the main menu
+		{
+			cout << "Invalid selection." << endl;
+			cout << "Please select one of the five numbers" << endl;
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			displayLoggedInMenu();
+		}
+	} 
 }
 
 //inputAccount to take user input
 Account inputAccount(Account& account) {
     cout << "Creating a new account." << endl;
+
     cout << "Please enter a user name: ";
     cin >> account.username;
 
@@ -259,27 +232,23 @@ void login(vector<Account>& accountFromFile) {
 
     int i_loggedIn = 0, i_attemptCount = 0;
     //get the username and password from the user to login
-    string uname, upassword;
+    string s_uname, s_upassword;
 
-	bool b_loggedIn = false;
-
-	while (i_attemptCount < 3 && !b_loggedIn)
+	while (i_attemptCount < 3 && (i_loggedIn == 0))
 	{
 		cout << "Enter user name: ";
-		cin >> uname;
+		cin >> s_uname;
 		cout << "Enter password: ";
-		cin >> upassword;
+		cin >> s_upassword;
 
 		for (int i = 0; i < accountFromFile.size(); i++)
 		{
-			if (accountFromFile[i].username == uname && accountFromFile[i].password == upassword)
+			if (accountFromFile[i].username == s_uname && accountFromFile[i].password == s_upassword)
 			{
-				cout << uname << " logged in" << endl;
+				cout << s_uname << " logged in" << endl;
 				displayLoggedInMenu();
-				b_loggedIn = true;
 				i_loggedIn = 1;
 				return; //we are now logged in so return out of this function
-
 			}
 		}
 		if (i_loggedIn != 1)
