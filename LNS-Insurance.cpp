@@ -45,44 +45,66 @@ Vehicle Insurance System
 Select an option from the menu below
 )" << endl;
 
-	displayMainMenu(); //show menu
+	
 	runProgram(); //start the application, expecting user input
 }
 
 
 //main program operation
-void runProgram() {
+void runProgram()
+{
 	int i_menuSelection = 0;
-    Account account;//data from the user
-    vector <Account>accountFromFile;//data from the file
+	Account account;//data from the user
+	vector <Account>accountFromFile;//data from the file
+	displayMainMenu(); //show menu
+	bool b_runProgram = true;
 
-    do //application continues until the user requests to exit
+	while (b_runProgram)
 	{
+		
+
 		if (cin >> i_menuSelection)
 		{
-			switch (i_menuSelection) {
+			switch (i_menuSelection)
+			{
 			case 1:
-                accountFromFile = readFromFile();
-                login(accountFromFile);
+			{
+				accountFromFile = readFromFile();
+				login(accountFromFile);
 				break;
+			}
+
 			case 2:
-                inputAccount(account);
-                writeToFile(account);
+			{
+				inputAccount(account);
+				writeToFile(account);
 				break;
+			}
+
 			case 3:
+			{
 				displayAbout();
 				displayMainMenu();
 				break;
-			case 4: //exit condition
+			}
+
+			case 4:
+			{
+				b_runProgram = false; //false so let's get out of here
 				break;
-			default: //validation for other numbers
+			}
+
+			default:
+			{
 				cout << "Invalid selection." << endl;
 				cout << "Please enter one of the four numbers" << endl;
 				displayMainMenu();
 				break;
 			}
+			}
+
 		}
-		else //validation for non numeric input
+		else
 		{
 			cout << "Invalid selection." << endl;
 			cout << "Please select one of the four numbers" << endl;
@@ -90,10 +112,11 @@ void runProgram() {
 			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			displayMainMenu();
 		}
+		
 
-	} while (i_menuSelection != 4); //monitoring for exit request
-
+	}
 	cout << "Exiting application. Goodbye." << endl; //exit message
+
 }
 
 //displays main menu
@@ -130,44 +153,50 @@ void loggedInFunctions()
 {
 	int i_menuSelection = 0;
 
-	do 
+	bool b_runLoggedMenu = true;
+	
+	while (b_runLoggedMenu) 
 	{
-	if (cin >> i_menuSelection)
+		if (cin >> i_menuSelection)
 		{
-			switch (i_menuSelection) {
-			case 1:
-				cout << "Insurer details" << endl;
-				break;
-			case 2:
-				cout << "Car details" << endl;
-				break;
-			case 3:
-				cout << "Available policies" << endl;
-				break;
-			case 4: 
-				cout << "Submit a claim" << endl;
-				break;
-			case 5: 
-				cout << "Going back to the main menu" << endl;
-				displayMainMenu();
-				break;
-			default: //validation for other numbers
-				cout << "Invalid selection." << endl;
-				cout << "Please enter one of the five numbers" << endl;
-				displayLoggedInMenu();
-				break;
+			{
+				switch (i_menuSelection) {
+				case 1:
+					cout << "Insurer details" << endl;
+					break;
+				case 2:
+					cout << "Car details" << endl;
+					break;
+				case 3:
+					cout << "Available policies" << endl;
+					break;
+				case 4:
+					cout << "Submit a claim" << endl;
+					break;
+				case 5:
+					cout << "Going back to the main menu" << endl;
+					displayMainMenu();
+					b_runLoggedMenu = false;
+					break;
+				default: //validation for other numbers
+					cout << "Invalid selection." << endl;
+					cout << "Please enter one of the five numbers" << endl;
+					displayLoggedInMenu();
+					break;
+				}
 			}
+
 		}
 		else //validation for non numeric input
-		{
-			cout << "Invalid selection." << endl;
-			cout << "Please select one of the five numbers" << endl;
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			displayLoggedInMenu();
-		}
+			{
+				cout << "Invalid selection." << endl;
+				cout << "Please select one of the five numbers" << endl;
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+				displayLoggedInMenu();
+			}
 
-	} while (i_menuSelection != 5); //monitoring for request to return to the main menu
+	} //monitoring for request to return to the main menu
 }
 
 //inputAccount to take user input
@@ -232,7 +261,9 @@ void login(vector<Account>& accountFromFile) {
     //get the username and password from the user to login
     string uname, upassword;
 
-	while (i_attemptCount < 3)
+	bool b_loggedIn = false;
+
+	while (i_attemptCount < 3 && !b_loggedIn)
 	{
 		cout << "Enter user name: ";
 		cin >> uname;
@@ -245,7 +276,10 @@ void login(vector<Account>& accountFromFile) {
 			{
 				cout << uname << " logged in" << endl;
 				displayLoggedInMenu();
+				b_loggedIn = true;
 				i_loggedIn = 1;
+				return; //we are now logged in so return out of this function
+
 			}
 		}
 		if (i_loggedIn != 1)
