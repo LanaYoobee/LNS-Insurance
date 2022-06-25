@@ -25,6 +25,7 @@ struct sAddress
 };
 struct sCustomer
 {
+	
 	string s_customerName;
 	int i_age;
 	string s_emailAddress;

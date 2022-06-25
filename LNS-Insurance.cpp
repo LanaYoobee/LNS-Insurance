@@ -13,12 +13,42 @@ struct Account {
 	string username;
 	string password;
 
+	string s_customerName;
+	string i_age;
+	string s_emailAddress;
+	string s_streetname;
+	string i_phoneNumber;
+	string s_car;
+	string s_year;
+	string s_price;
+
+
 	//constructor to initialize the variables of the struct
-	Account(string u = "user1", string p = "pass1") {
+	/*Account(string u = "user1", string p = "pass1") {
 		username = u;
 		password = p;
-	}
+	}*/
 };
+
+struct sCustomer
+{
+	string username;
+	string password;				//holds the username and password
+	string s_customerName;
+	string i_age;
+	string s_emailAddress;
+	string s_streetname;
+	string i_phoneNumber;
+	string s_car;
+	string s_year;
+	string s_price;
+
+
+};
+
+//global variables
+vector<Account> g_Customer; //this stores all the customer data read in from the file
+Account g_LoggedInPerson; //this keeps track of who is logged in
 
 /// Function prototypes
 void runProgram();
@@ -139,6 +169,11 @@ void loggedInFunctions()
 			{
 			case 1:
 				cout << "Insurer details" << endl;
+				cout << "User name: " << g_LoggedInPerson.username << endl;
+				cout << "Customer name: " << g_LoggedInPerson.s_customerName << endl;
+				cout << "Email address: " << g_LoggedInPerson.s_emailAddress << endl;
+				
+
 				break;
 			case 2:
 				cout << "Car details" << endl;
@@ -231,7 +266,7 @@ void writeToFile(Account account) {
 vector <Account> readFromFile() {
 
 	fstream loginDetails("loginDetails.csv", ios::in);
-	vector<Account> tempAccount;
+	//vector<Account> tempAccount;
 
 	Account a;
 	string line;
@@ -242,14 +277,61 @@ vector <Account> readFromFile() {
 		//until the appearance of comma, everything is stored in item
 		getline(linestream, item, ',');
 		a.username = item;
+		//cout << a.username << endl;
 
 		getline(linestream, item, ',');
 		a.password = item;
+		//cout << a.password << endl;
 
-		tempAccount.push_back(a);
+		getline(linestream, item, ',');
+		a.s_customerName = item;
+		//cout << a.s_customerName << endl;
+
+
+		getline(linestream, item, ',');
+		a.i_age = item;
+		//cout << a.i_age << endl;
+
+
+		getline(linestream, item, ',');
+		a.s_customerName = item;
+		//cout << a.s_customerName << endl;
+
+
+		getline(linestream, item, ',');
+		a.s_emailAddress = item;
+		//cout << a.s_emailAddress << endl;
+
+
+		getline(linestream, item, ',');
+		a.s_streetname = item;
+		//cout << a.s_streetname << endl;
+
+
+		getline(linestream, item, ',');
+		a.i_phoneNumber = item;
+		//cout << a.i_phoneNumber << endl;
+
+
+		getline(linestream, item, ',');
+		a.s_car = item;
+		//cout << a.s_car << endl;
+
+
+		getline(linestream, item, ',');
+		a.s_year = item;
+		//cout << a.s_year << endl;
+
+
+		getline(linestream, item, ',');
+		a.s_price = item;
+		//cout << a.s_price << endl;
+
+
+		g_Customer.push_back(a);
 	}
 	loginDetails.close();
-	return(tempAccount);
+	return(g_Customer);
 }
 
 //login function to search for the username and password
@@ -271,8 +353,16 @@ void login(vector<Account>& accountFromFile) {
 			if (accountFromFile[i].username == s_uname && accountFromFile[i].password == s_upassword)
 			{
 				cout << s_uname << " logged in" << endl;
+				
+				//copy data across from logged in person into global variable
+				g_LoggedInPerson = accountFromFile[i];
+				
+				
 				displayLoggedInMenu();
 				i_loggedIn = 1;
+				
+				
+
 				return; //we are now logged in so return out of this function
 			}
 		}
