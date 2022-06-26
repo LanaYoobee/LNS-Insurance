@@ -468,6 +468,7 @@ void viewPolicies() {
 	cout << "You currently have the following policies. " << endl;
 	showPolicyDetails(s_loggedInUser);
 	displayPolicyMenu();
+
 	cin >> i_menuSelection;
 
 	if (cin >> i_menuSelection)
