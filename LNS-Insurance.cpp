@@ -50,7 +50,7 @@ void adminFunctions();
 Account createAccount(Account&);
 void viewPolicies();
 void writeAccountToFile(Account);
-void showPolicies(string);
+void showPolicyDetails(string);
 Policy createPolicy(string);
 bool checkUserNameExists(string);
 bool checkPassValidity(string);
@@ -149,7 +149,8 @@ void loggedInFunctions()
 				break;
 			case 2:
 				cout << "Available policies" << endl;
-				showPolicies(s_loggedInUser);
+				showPolicyDetails(s_loggedInUser);
+				displayPolicyMenu();
 				break;
 			case 3:
 				cout << "Submit a claim" << endl;
@@ -465,19 +466,16 @@ void viewPolicies() {
 	bool b_policyMenu = true;
 
 	cout << "You currently have the following policies. " << endl;
-	showPolicies(s_loggedInUser);
-
+	showPolicyDetails(s_loggedInUser);
 	displayPolicyMenu();
-
 	cin >> i_menuSelection;
 
-	while (b_policyMenu)
-	{
-		if (cin >> i_menuSelection)
+	if (cin >> i_menuSelection)
 		{
 			switch (i_menuSelection)
 			{
 			case 1:
+				b_policyMenu = true;
 				createPolicy(s_loggedInUser);
 				displayPolicyMenu();
 				break;
@@ -501,7 +499,7 @@ void viewPolicies() {
 			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			displayPolicyMenu();
 		}
-	}
+
 }
 
 Policy createPolicy(string s_loggedInUser) {
@@ -560,15 +558,16 @@ vector <Policy> readPolicyFromFile() {
 }
 
 //show all policies for a given user name
-void showPolicies(string s_loggedInUser)
+void showPolicyDetails(string s_loggedInUser)
 {
 	policyFromFile = readPolicyFromFile();
 
 	cout << "Policies for " << s_loggedInUser << endl;
 
-		for (int i = 0; i < policyFromFile.size(); i++) //iterate through the file listing all policies for the given user 
-		{
-			if (policyFromFile[i].s_username == s_loggedInUser)
+	for (int i = 0; i < policyFromFile.size(); i++)
+	{
+		if (policyFromFile[i].s_username == s_loggedInUser) {
+			for (int i = 0; i < policyFromFile.size(); i++) //iterate through the file listing all policies for the given user 
 			{
 				cout << "Policy " << i + 1;
 				cout << "Car Make " << policyFromFile[i].s_carMake << endl;
@@ -576,6 +575,11 @@ void showPolicies(string s_loggedInUser)
 				cout << "Car Year " << policyFromFile[i].s_carYear << endl;
 				cout << "Insured Value " << policyFromFile[i].s_insuredValue << endl;
 			}
-			cout << "No policies found." << endl;
 		}
+		else {
+			cout << "No policies found." << endl;
+			break;
+		}
+	}
+	return;
 }
