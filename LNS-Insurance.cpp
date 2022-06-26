@@ -42,15 +42,16 @@ struct Policy {
 void mainMenuFunctions();
 void displayMainMenu();
 void displayAbout();
+void displayPolicyMenu();
 void displayLoggedInMenu();
 void displayAdminMenu();
 void loggedInFunctions();
 void adminFunctions();
 Account createAccount(Account&);
-Policy createPolicy(Policy&, Account);
+void viewPolicies();
 void writeAccountToFile(Account);
-void showPolicies(Account);
-void writePolicyToFile(Policy);
+void showPolicies(string);
+Policy createPolicy(string);
 bool checkUserNameExists(string);
 bool checkPassValidity(string);
 vector <Account> readAccountFromFile();
@@ -60,7 +61,10 @@ void forgotPassword();
 
 
 Account account;//data from the user
-vector <Account>accountFromFile;//data from the file
+vector <Account> accountFromFile;//data from the file
+Policy policy;//data from the user
+vector <Policy> policyFromFile;//data from the file
+string s_loggedInUser;
 
 //***********************
 //Functions
@@ -130,8 +134,6 @@ void mainMenuFunctions()
 
 void loggedInFunctions()
 {
-	Policy policy;//data from the user
-	vector <Policy> policyFromFile;//data from the file
 	int i_menuSelection = 0;
 
 	bool b_runLoggedMenu = true;
@@ -147,7 +149,7 @@ void loggedInFunctions()
 				break;
 			case 2:
 				cout << "Available policies" << endl;
-				createPolicy(policy, account);
+				showPolicies(s_loggedInUser);
 				break;
 			case 3:
 				cout << "Submit a claim" << endl;
@@ -378,6 +380,7 @@ void login(vector<Account>& accountFromFile) {
 			if (accountFromFile[i].s_username == s_uname && accountFromFile[i].s_password == s_upassword)
 			{
 				cout << s_uname << " logged in" << endl;
+				s_loggedInUser = s_uname;
 				if (s_uname == "Admin")
 					displayAdminMenu();
 				else
@@ -455,14 +458,14 @@ bool checkPassValidity(string p)
 //****************************
 
 
-//create a new Policy
-Policy createPolicy(Policy& policy, Account account) {
+//view policies
+void viewPolicies() {
 	int i_menuSelection = 0;
 
 	bool b_policyMenu = true;
 
 	cout << "You currently have the following policies. " << endl;
-	showPolicies(account);
+	showPolicies(s_loggedInUser);
 
 	displayPolicyMenu();
 
@@ -475,17 +478,7 @@ Policy createPolicy(Policy& policy, Account account) {
 			switch (i_menuSelection)
 			{
 			case 1:
-				cout << "activating case 1" << endl; //testing line
-				policy.s_username = account.s_username;
-				cout << "please enter your car make: ";
-				cin >> policy.s_carMake;
-				cout << "please enter your car model: ";
-				cin >> policy.s_carModel;
-				cout << "please enter your car year of manufacture: ";
-				cin >> policy.s_carYear;
-				cout << "please enter the value you'd like to ensure your car for: ";
-				cin >> policy.s_insuredValue;
-				writePolicyToFile(policy);
+				createPolicy(s_loggedInUser);
 				displayPolicyMenu();
 				break;
 			case 2:
@@ -509,15 +502,26 @@ Policy createPolicy(Policy& policy, Account account) {
 			displayPolicyMenu();
 		}
 	}
-	return (policy);
 }
 
-//writePolicyToFile function to store policy details
-void writePolicyToFile(Policy policy) {
+Policy createPolicy(string s_loggedInUser) {
+	cout << "Creating a new Policy." << endl;
+
+	policy.s_username = s_loggedInUser;
+	cout << "Please enter your car make: ";
+	cin >> policy.s_carMake;
+	cout << "Please enter your car model: ";
+	cin >> policy.s_carModel;
+	cout << "Please enter your car year of manufacture: ";
+	cin >> policy.s_carYear;
+	cout << "Please enter the value you'd like to ensure your car for: ";
+	cin >> policy.s_insuredValue;
 
 	fstream policyDetails("policyDetails.csv", ios::app);
 	policyDetails << policy.s_username << "," << policy.s_carMake << "," << policy.s_carModel << "," << policy.s_carYear << "," << policy.s_insuredValue << endl;
 	policyDetails.close();
+
+	return(policy);
 }
 
 //readPolicyFromFile function to read data from the policyDetails.csv
@@ -556,23 +560,22 @@ vector <Policy> readPolicyFromFile() {
 }
 
 //show all policies for a given user name
-void showPolicies(Account account)
+void showPolicies(string s_loggedInUser)
 {
-	string s_userName;
-	s_userName = account.s_username;
-	vector <Policy> policyFromFile = readPolicyFromFile();
+	policyFromFile = readPolicyFromFile();
 
-	for (int i = 0; i < policyFromFile.size(); i++) //iterate through the file listing all policies
-	{
-		if (account.s_username == s_userName)
+	cout << "Policies for " << s_loggedInUser << endl;
+
+		for (int i = 0; i < policyFromFile.size(); i++) //iterate through the file listing all policies for the given user 
 		{
-			cout << "Policies for " << s_userName << endl;
-			cout << "Car Make " << policyFromFile[i].s_carMake;
-			cout << "Car Model " << policyFromFile[i].s_carModel;
-			cout << "Car Year " << policyFromFile[i].s_carYear;
-			cout << "Insured Value " << policyFromFile[i].s_insuredValue;
-			return;
+			if (policyFromFile[i].s_username == s_loggedInUser)
+			{
+				cout << "Policy " << i + 1;
+				cout << "Car Make " << policyFromFile[i].s_carMake << endl;
+				cout << "Car Model " << policyFromFile[i].s_carModel << endl;
+				cout << "Car Year " << policyFromFile[i].s_carYear << endl;
+				cout << "Insured Value " << policyFromFile[i].s_insuredValue << endl;
+			}
+			cout << "No policies found." << endl;
 		}
-	}
-	cout << "No policies found." << endl;
 }
