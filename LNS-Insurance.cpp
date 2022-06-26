@@ -35,6 +35,18 @@ struct Policy {
 	}
 };
 
+struct Claim {
+	string s_username, s_policyID, s_claimType, s_claimStatus;
+
+	//constructor to initialize the variables of the struct
+	Claim(string s_u = "user1", string s_pID = "1", string s_cType = "Stolen", string s_cStatus = "Submitted") {
+		s_username = s_u;
+		s_policyID = s_pID;
+		s_claimType = s_cType;
+		s_claimStatus = s_cStatus;
+	}
+};
+
 //***********************
 //Function prototypes
 //***********************
@@ -46,26 +58,33 @@ void displayInsurerDetails();
 void displayPolicyMenu();
 void displayLoggedInMenu();
 void displayAdminMenu();
+
 void loggedInFunctions();
 void adminFunctions();
 Account createAccount(Account&);
 void viewPolicies();
+void viewClaims();
 void writeAccountToFile(Account);
-void writePolicytToFile(Policy);
+void writePolicyToFile(Policy);
 void showPolicyDetails(string);
+void showClaimDetails(string);
 Policy createPolicy(string);
 bool checkUserNameExists(string);
 bool checkPassValidity(string);
 vector <Account> readAccountFromFile();
+vector <Policy> readPolicyFromFile();
+vector <Claim> readClaimFromFile();
 void login(vector<Account>&);
 void forgotPassword();
-
-
+Claim createClaim(string);
+void writeClaimToFile(Claim);
 
 Account account;//data from the user
 vector <Account> accountFromFile;//data from the file
 Policy policy;//data from the user
 vector <Policy> policyFromFile;//data from the file
+Claim claim;//data from the user
+vector <Claim> claimFromFile;//data from the file
 string s_loggedInUser;
 
 //***********************
@@ -113,7 +132,7 @@ void mainMenuFunctions()
 				break;
 			case 4:
 				b_runProgram = false; //false so let's get out of here
-				break;
+				return;
 			default:
 				cout << "Invalid selection." << endl;
 				cout << "Please enter one of the four numbers" << endl;
@@ -149,19 +168,18 @@ void loggedInFunctions()
 			case 1:
 				displayInsurerDetails();
 				displayLoggedInMenu();
-				break;
+				return;
 			case 2:
 				viewPolicies();
-
-				break;
+				return;
 			case 3:
-				cout << "Submit a claim" << endl;
-				break;
+				viewClaims();
+				return;
 			case 4:
 				cout << "Going back to the main menu" << endl;
 				displayMainMenu();
 				b_runLoggedMenu = false;
-				break;
+				return;
 			default: //validation for other numbers
 				cout << "Invalid selection." << endl;
 				cout << "Please enter one of the four numbers" << endl;
@@ -205,7 +223,7 @@ void adminFunctions()
 				cout << "Going back to the main menu" << endl;
 				displayMainMenu();
 				b_runAdminMenu = false;
-				break;
+				return;
 			default: //validation for other numbers
 				cout << "Invalid selection." << endl;
 				cout << "Please enter one of the four numbers" << endl;
@@ -266,6 +284,15 @@ void displayPolicyMenu()
 	cout << "2. No. Return to the previous menu." << endl;
 }
 
+//menu to view claims and create new claims
+void displayClaimMenu()
+{
+	cout << endl << "Would you like to submit a new claim? " << endl;
+	cout << "1. Yes." << endl;
+	cout << "2. No. Return to the previous menu." << endl;
+}
+
+
 
 //the result of About selection
 void displayAbout()
@@ -277,7 +304,7 @@ Developed by Lana Lankevich and Saadi Radcliffe
 )";
 }
 
-//the result of About selection
+//the result of Insurer Details selection
 void displayInsurerDetails()
 {
 	cout << R"(You are insured with LNS Insurance
@@ -492,14 +519,14 @@ void viewPolicies() {
 			case 1:
 				b_policyMenu = true;
 				createPolicy(s_loggedInUser);
-				writePolicytToFile(policy);
+				writePolicyToFile(policy);
 				displayPolicyMenu();
-				break;
+				return;
 			case 2:
 				cout << "Going back to the previous menu" << endl;
 				b_policyMenu = false;
 				displayLoggedInMenu();
-				break;
+				return;
 			default: //validation for other numbers
 				cout << "Invalid selection." << endl;
 				cout << "Please enter one of the two numbers" << endl;
@@ -518,6 +545,7 @@ void viewPolicies() {
 	}
 }
 
+//take user input to create a new policy
 Policy createPolicy(string s_loggedInUser) {
 	cout << "Creating a new Policy." << endl;
 
@@ -534,8 +562,8 @@ Policy createPolicy(string s_loggedInUser) {
 	return(policy);
 }
 
-// writePolicyToFile function to store login details
-void writePolicytToFile(Policy policy) {
+// writePolicyToFile function to store policy details
+void writePolicyToFile(Policy policy) {
 
 	fstream policyDetails("policyDetails.csv", ios::app);
 	policyDetails << policy.s_username << "," << policy.s_carMake << "," << policy.s_carModel << "," << policy.s_carYear << "," << policy.s_insuredValue << endl;
@@ -586,12 +614,13 @@ void showPolicyDetails(string s_loggedInUser)
 	{
 		if (policyFromFile[i].s_username == s_loggedInUser)
 		{
+			cout << "User " << s_loggedInUser << " has these policies:" << endl;
 			for (int i = 0; i < policyFromFile.size(); i++) //iterate through the file listing all policies for the given user
 			{
 				if (policyFromFile[i].s_username == s_loggedInUser)
 
 				{
-					cout << endl << "Policy ID " << i + 1 << endl;
+					cout << endl << "Policy ID " << i << endl;
 					cout << "Car Make " << policyFromFile[i].s_carMake << endl;
 					cout << "Car Model " << policyFromFile[i].s_carModel << endl;
 					cout << "Car Year " << policyFromFile[i].s_carYear << endl;
@@ -605,7 +634,142 @@ void showPolicyDetails(string s_loggedInUser)
 			cout << "No policies found." << endl;
 			return;
 		}
-	}
+	}	
+}
 
-	
+//readClaimFromFile function to read data from the claimDetails.csv
+vector <Claim> readClaimFromFile() {
+
+	fstream claimDetails("claimDetails.csv", ios::in);
+	vector<Claim> tempClaim;
+
+	Claim c;
+	string line;
+	while (getline(claimDetails, line)) {
+
+		istringstream linestream(line);//to split the row into columns/properties
+		string s_item;
+
+		//until the appearance of comma, everything is stored in item
+		getline(linestream, s_item, ',');
+		c.s_username = s_item;
+
+		getline(linestream, s_item, ',');
+		c.s_policyID = s_item;
+
+		getline(linestream, s_item, ',');
+		c.s_claimType = s_item;
+
+		getline(linestream, s_item, ',');
+		c.s_claimStatus = s_item;
+
+		tempClaim.push_back(c);
+	}
+	claimDetails.close();
+	return(tempClaim);
+}
+
+//view Claims
+void viewClaims() {
+	int i_menuSelection = 0;
+
+	bool b_claimMenu = true;
+
+	showClaimDetails(s_loggedInUser);
+
+	displayClaimMenu();
+
+	while (b_claimMenu) {
+
+		cin >> i_menuSelection;
+
+		if (cin >> i_menuSelection)
+		{
+			switch (i_menuSelection)
+			{
+			case 1:
+				b_claimMenu = true;
+				createClaim(s_loggedInUser);
+				writeClaimToFile(claim);
+				displayClaimMenu();
+				return;
+			case 2:
+				cout << "Going back to the previous menu" << endl;
+				b_claimMenu = false;
+				displayLoggedInMenu();
+				return;
+			default: //validation for other numbers
+				cout << "Invalid selection." << endl;
+				cout << "Please enter one of the two numbers" << endl;
+				displayPolicyMenu();
+				break;
+			}
+		}
+		else //validation for non numeric input
+		{
+			cout << "Invalid selection." << endl;
+			cout << "Please select one of the two numbers" << endl;
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			displayPolicyMenu();
+		}
+	}
+}
+
+//take user input to create a new claim
+Claim createClaim(string s_loggedInUser) {
+	cout << "Creating a new Claim." << endl;
+
+	claim.s_username = s_loggedInUser;
+
+	showPolicyDetails(s_loggedInUser);
+
+	cout << "Which Policy ID would you like to make a claim for? ";
+	cin >> claim.s_policyID;
+	cout << "What is the claim for? (eg, stolen, fire, car accident)";
+	cin >> claim.s_claimType;
+
+	claim.s_claimStatus = "Submitted";
+
+	cout << "Your claim has been submitted." << endl;
+
+	return(claim);
+}
+
+// writeClaimToFile function to store claim details
+void writeClaimToFile(Claim claim) {
+
+	fstream claimDetails("claimDetails.csv", ios::app);
+	claimDetails << claim.s_username << "," << claim.s_policyID << "," << claim.s_claimType << "," << claim.s_claimStatus << endl;
+	claimDetails.close();
+}
+
+//show all claims for a given user name
+void showClaimDetails(string s_loggedInUser)
+{
+	claimFromFile = readClaimFromFile();
+
+	for (int i = 0; i < claimFromFile.size(); i++)
+	{
+		if (claimFromFile[i].s_username == s_loggedInUser)
+		{
+			cout << "User " << s_loggedInUser << " has these claims:" << endl;
+			for (int i = 0; i < claimFromFile.size(); i++) //iterate through the file listing all claims for the given user
+			{
+				if (claimFromFile[i].s_username == s_loggedInUser)
+
+				{
+					cout << endl << "Policy ID " << claimFromFile[i].s_policyID << endl;
+					cout << "Car Make " << claimFromFile[i].s_claimType << endl;
+					cout << "Car Model " << claimFromFile[i].s_claimStatus << endl;
+				}
+			}
+			return;
+		}
+		else
+		{
+			cout << "No claims found." << endl;
+			return;
+		}
+	}
 }
