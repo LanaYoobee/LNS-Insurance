@@ -273,7 +273,7 @@ void displayLoggedInMenu()
 {
 	cout << endl << "1. Show insurer details" << endl;
 	cout << "2. Policies" << endl;
-	cout << "3. Submit a claim" << endl;
+	cout << "3. Claims" << endl;
 	cout << "4. Go back to the main menu" << endl;
 }
 
@@ -516,8 +516,6 @@ void viewPolicies() {
 
 	while (b_policyMenu) {
 
-		cin >> i_menuSelection;
-
 		if (cin >> i_menuSelection)
 		{
 			switch (i_menuSelection)
@@ -530,7 +528,6 @@ void viewPolicies() {
 				break;
 			case 2:
 				cout << "Going back to the previous menu" << endl;
-				displayLoggedInMenu();
 				b_policyMenu = false;
 				return;
 			default: //validation for other numbers
@@ -703,8 +700,6 @@ void viewClaims() {
 
 	while (b_claimMenu) {
 
-		cin >> i_menuSelection;
-
 		if (cin >> i_menuSelection)
 		{
 			switch (i_menuSelection)
@@ -718,7 +713,6 @@ void viewClaims() {
 			case 2:
 				cout << "Going back to the previous menu" << endl;
 				b_claimMenu = false;
-				displayLoggedInMenu();
 				return;
 			default: //validation for other numbers
 				cout << "Invalid selection." << endl;
