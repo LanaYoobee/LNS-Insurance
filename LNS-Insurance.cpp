@@ -168,13 +168,15 @@ void loggedInFunctions()
 			case 1:
 				displayInsurerDetails();
 				displayLoggedInMenu();
-				return;
+				break;
 			case 2:
 				viewPolicies();
-				return;
+				displayLoggedInMenu();
+				break;
 			case 3:
 				viewClaims();
-				return;
+				displayLoggedInMenu();
+				break;
 			case 4:
 				cout << "Going back to the main menu" << endl;
 				displayMainMenu();
@@ -263,7 +265,6 @@ void displayAdminMenu()
 	cout << "2. Manage policies" << endl;
 	cout << "3. Manage claims" << endl;
 	cout << "4. Go back to the main menu" << endl;
-	adminFunctions();
 }
 
 //menu visible to people who are logged in
@@ -273,7 +274,6 @@ void displayLoggedInMenu()
 	cout << "2. Policies" << endl;
 	cout << "3. Submit a claim" << endl;
 	cout << "4. Go back to the main menu" << endl;
-	loggedInFunctions();
 }
 
 //menu to view policies and create new policies
@@ -421,10 +421,15 @@ void login(vector<Account>& accountFromFile) {
 			{
 				cout << s_uname << " logged in" << endl;
 				s_loggedInUser = s_uname;
-				if (s_uname == "Admin")
+				if (s_uname == "Admin") {
 					displayAdminMenu();
+					adminFunctions();
+				}
 				else
+				{
 					displayLoggedInMenu();
+					loggedInFunctions();
+				}
 				i_loggedIn = 1;
 				return; //we are now logged in so return out of this function
 			}
@@ -521,11 +526,11 @@ void viewPolicies() {
 				createPolicy(s_loggedInUser);
 				writePolicyToFile(policy);
 				displayPolicyMenu();
-				return;
+				break;
 			case 2:
 				cout << "Going back to the previous menu" << endl;
-				b_policyMenu = false;
 				displayLoggedInMenu();
+				b_policyMenu = false;
 				return;
 			default: //validation for other numbers
 				cout << "Invalid selection." << endl;
