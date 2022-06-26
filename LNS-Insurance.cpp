@@ -184,7 +184,7 @@ void loggedInFunctions()
 				return;
 			default: //validation for other numbers
 				cout << "Invalid selection." << endl;
-				cout << "Please enter one of the four numbers" << endl;
+cout << "Please enter one of the four numbers" << endl;
 				displayLoggedInMenu();
 				break;
 			}
@@ -515,7 +515,7 @@ void viewPolicies() {
 
 	while (b_policyMenu) {
 
-		cin >> i_menuSelection;
+		//cin >> i_menuSelection;
 
 		if (cin >> i_menuSelection)
 		{
@@ -529,7 +529,7 @@ void viewPolicies() {
 				break;
 			case 2:
 				cout << "Going back to the previous menu" << endl;
-				displayLoggedInMenu();
+				//displayLoggedInMenu();
 				b_policyMenu = false;
 				return;
 			default: //validation for other numbers
