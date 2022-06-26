@@ -42,6 +42,7 @@ struct Policy {
 void mainMenuFunctions();
 void displayMainMenu();
 void displayAbout();
+void displayInsurerDetails();
 void displayPolicyMenu();
 void displayLoggedInMenu();
 void displayAdminMenu();
@@ -50,6 +51,7 @@ void adminFunctions();
 Account createAccount(Account&);
 void viewPolicies();
 void writeAccountToFile(Account);
+void writePolicytToFile(Policy);
 void showPolicyDetails(string);
 Policy createPolicy(string);
 bool checkUserNameExists(string);
@@ -145,12 +147,12 @@ void loggedInFunctions()
 			switch (i_menuSelection)
 			{
 			case 1:
-				cout << "Insurer details" << endl;
+				displayInsurerDetails();
+				displayLoggedInMenu();
 				break;
 			case 2:
-				cout << "Available policies" << endl;
-				showPolicyDetails(s_loggedInUser);
-				displayPolicyMenu();
+				viewPolicies();
+
 				break;
 			case 3:
 				cout << "Submit a claim" << endl;
@@ -272,6 +274,16 @@ void displayAbout()
 ***********************************************
 Vehicle Insurance System
 Developed by Lana Lankevich and Saadi Radcliffe
+)";
+}
+
+//the result of About selection
+void displayInsurerDetails()
+{
+	cout << R"(You are insured with LNS Insurance
+***********************************************
+for any problems or concerns, please contact Insurance Admin
+email: admin@lnsinsurance.fake.com
 )";
 }
 
@@ -465,19 +477,22 @@ void viewPolicies() {
 
 	bool b_policyMenu = true;
 
-	cout << "You currently have the following policies. " << endl;
 	showPolicyDetails(s_loggedInUser);
+
 	displayPolicyMenu();
 
-	cin >> i_menuSelection;
+	while (b_policyMenu) {
 
-	if (cin >> i_menuSelection)
+		cin >> i_menuSelection;
+
+		if (cin >> i_menuSelection)
 		{
 			switch (i_menuSelection)
 			{
 			case 1:
 				b_policyMenu = true;
 				createPolicy(s_loggedInUser);
+				writePolicytToFile(policy);
 				displayPolicyMenu();
 				break;
 			case 2:
@@ -500,7 +515,7 @@ void viewPolicies() {
 			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			displayPolicyMenu();
 		}
-
+	}
 }
 
 Policy createPolicy(string s_loggedInUser) {
@@ -516,11 +531,15 @@ Policy createPolicy(string s_loggedInUser) {
 	cout << "Please enter the value you'd like to ensure your car for: ";
 	cin >> policy.s_insuredValue;
 
+	return(policy);
+}
+
+// writePolicyToFile function to store login details
+void writePolicytToFile(Policy policy) {
+
 	fstream policyDetails("policyDetails.csv", ios::app);
 	policyDetails << policy.s_username << "," << policy.s_carMake << "," << policy.s_carModel << "," << policy.s_carYear << "," << policy.s_insuredValue << endl;
 	policyDetails.close();
-
-	return(policy);
 }
 
 //readPolicyFromFile function to read data from the policyDetails.csv
@@ -563,24 +582,30 @@ void showPolicyDetails(string s_loggedInUser)
 {
 	policyFromFile = readPolicyFromFile();
 
-	cout << "Policies for " << s_loggedInUser << endl;
-
 	for (int i = 0; i < policyFromFile.size(); i++)
 	{
-		if (policyFromFile[i].s_username == s_loggedInUser) {
-			for (int i = 0; i < policyFromFile.size(); i++) //iterate through the file listing all policies for the given user 
+		if (policyFromFile[i].s_username == s_loggedInUser)
+		{
+			for (int i = 0; i < policyFromFile.size(); i++) //iterate through the file listing all policies for the given user
 			{
-				cout << "Policy " << i + 1;
-				cout << "Car Make " << policyFromFile[i].s_carMake << endl;
-				cout << "Car Model " << policyFromFile[i].s_carModel << endl;
-				cout << "Car Year " << policyFromFile[i].s_carYear << endl;
-				cout << "Insured Value " << policyFromFile[i].s_insuredValue << endl;
+				if (policyFromFile[i].s_username == s_loggedInUser)
+
+				{
+					cout << endl << "Policy ID " << i + 1 << endl;
+					cout << "Car Make " << policyFromFile[i].s_carMake << endl;
+					cout << "Car Model " << policyFromFile[i].s_carModel << endl;
+					cout << "Car Year " << policyFromFile[i].s_carYear << endl;
+					cout << "Insured Value " << policyFromFile[i].s_insuredValue << endl;
+				}
 			}
+			return;
 		}
-		else {
+		else 
+		{
 			cout << "No policies found." << endl;
-			break;
+			return;
 		}
 	}
-	return;
+
+	
 }
