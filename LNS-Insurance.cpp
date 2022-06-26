@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <sstream> 
 #include <vector> 
 using namespace std;
@@ -168,13 +167,15 @@ void loggedInFunctions()
 			case 1:
 				displayInsurerDetails();
 				displayLoggedInMenu();
-				return;
+				break;
 			case 2:
 				viewPolicies();
-				return;
+				displayLoggedInMenu();
+				break;
 			case 3:
 				viewClaims();
-				return;
+				displayLoggedInMenu();
+				break;
 			case 4:
 				cout << "Going back to the main menu" << endl;
 				displayMainMenu();
@@ -214,10 +215,12 @@ void adminFunctions()
 				cout << "Below is the list of users and their passwords" << endl;
 				break;
 			case 2:
-				cout << "Below is the list of all policies" << endl;
+				showPolicyDetails(s_loggedInUser);
+				displayAdminMenu();
 				break;
 			case 3:
-				cout << "Below is a list of all claims" << endl;
+				showClaimDetails(s_loggedInUser);
+				displayAdminMenu();
 				break;
 			case 4:
 				cout << "Going back to the main menu" << endl;
@@ -263,7 +266,6 @@ void displayAdminMenu()
 	cout << "2. Manage policies" << endl;
 	cout << "3. Manage claims" << endl;
 	cout << "4. Go back to the main menu" << endl;
-	adminFunctions();
 }
 
 //menu visible to people who are logged in
@@ -273,7 +275,6 @@ void displayLoggedInMenu()
 	cout << "2. Policies" << endl;
 	cout << "3. Submit a claim" << endl;
 	cout << "4. Go back to the main menu" << endl;
-	loggedInFunctions();
 }
 
 //menu to view policies and create new policies
@@ -421,10 +422,15 @@ void login(vector<Account>& accountFromFile) {
 			{
 				cout << s_uname << " logged in" << endl;
 				s_loggedInUser = s_uname;
-				if (s_uname == "Admin")
+				if (s_uname == "Admin") {
 					displayAdminMenu();
+					adminFunctions();
+				}
 				else
+				{
 					displayLoggedInMenu();
+					loggedInFunctions();
+				}
 				i_loggedIn = 1;
 				return; //we are now logged in so return out of this function
 			}
@@ -521,11 +527,11 @@ void viewPolicies() {
 				createPolicy(s_loggedInUser);
 				writePolicyToFile(policy);
 				displayPolicyMenu();
-				return;
+				break;
 			case 2:
 				cout << "Going back to the previous menu" << endl;
-				b_policyMenu = false;
 				displayLoggedInMenu();
+				b_policyMenu = false;
 				return;
 			default: //validation for other numbers
 				cout << "Invalid selection." << endl;
@@ -612,7 +618,21 @@ void showPolicyDetails(string s_loggedInUser)
 
 	for (int i = 0; i < policyFromFile.size(); i++)
 	{
-		if (policyFromFile[i].s_username == s_loggedInUser)
+		if (s_loggedInUser == "Admin")
+		{
+			cout << "Below is the list of all existing policies" << endl;
+			for (int i = 0; i < policyFromFile.size(); i++) //iterate through the file listing all policies for all users
+			{
+					cout << endl << policyFromFile[i].s_username << endl;
+					cout << "Policy ID " << i << endl;
+					cout << "Car Make " << policyFromFile[i].s_carMake << endl;
+					cout << "Car Model " << policyFromFile[i].s_carModel << endl;
+					cout << "Car Year " << policyFromFile[i].s_carYear << endl;
+					cout << "Insured Value " << policyFromFile[i].s_insuredValue << endl;
+			}
+			return;
+		}
+		else if (policyFromFile[i].s_username == s_loggedInUser)
 		{
 			cout << "User " << s_loggedInUser << " has these policies:" << endl;
 			for (int i = 0; i < policyFromFile.size(); i++) //iterate through the file listing all policies for the given user
@@ -636,6 +656,8 @@ void showPolicyDetails(string s_loggedInUser)
 		}
 	}	
 }
+
+
 
 //readClaimFromFile function to read data from the claimDetails.csv
 vector <Claim> readClaimFromFile() {
@@ -751,7 +773,21 @@ void showClaimDetails(string s_loggedInUser)
 
 	for (int i = 0; i < claimFromFile.size(); i++)
 	{
-		if (claimFromFile[i].s_username == s_loggedInUser)
+
+		if (s_loggedInUser == "Admin")
+		{
+			cout << "Below is the list of all existing claims" << endl;
+			for (int i = 0; i < claimFromFile.size(); i++) //iterate through the file listing all claims for all users
+			{
+				cout << endl << "User " << claimFromFile[i].s_username << endl;
+				cout << endl << "Policy ID " << claimFromFile[i].s_policyID << endl;
+				cout << "Car Make " << claimFromFile[i].s_claimType << endl;
+				cout << "Car Model " << claimFromFile[i].s_claimStatus << endl;
+
+			}
+			return;
+		}
+		else if (claimFromFile[i].s_username == s_loggedInUser)
 		{
 			cout << "User " << s_loggedInUser << " has these claims:" << endl;
 			for (int i = 0; i < claimFromFile.size(); i++) //iterate through the file listing all claims for the given user
