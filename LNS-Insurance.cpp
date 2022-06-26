@@ -8,33 +8,64 @@
 #include <vector> 
 using namespace std;
 
-/// Structs
+//***********************
+//Struct definitions
+//***********************
+
 struct Account {
-	string username;
-	string password;
+	string s_username, s_password;
 
 	//constructor to initialize the variables of the struct
-	Account(string u = "user1", string p = "pass1") {
-		username = u;
-		password = p;
+	Account(string s_u = "user1", string s_p = "pass1") {
+		s_username = s_u;
+		s_password = s_p;
 	}
 };
 
-/// Function prototypes
-void runProgram();
+struct Policy {
+	string s_username, s_carMake, s_carModel, s_carYear, s_insuredValue;
+
+	//constructor to initialize the variables of the struct
+	Policy(string s_u = "user1", string s_cMake = "Toyota", string s_cModel = "Corolla", string s_cY = "2021", string s_iV = "24500") {
+		s_username = s_u;
+		s_carMake = s_cMake;
+		s_carModel = s_cModel;
+		s_carYear = s_cY;
+		s_insuredValue = s_iV;
+	}
+};
+
+//***********************
+//Function prototypes
+//***********************
+
+void mainMenuFunctions();
 void displayMainMenu();
 void displayAbout();
 void displayLoggedInMenu();
 void displayAdminMenu();
 void loggedInFunctions();
 void adminFunctions();
-Account inputAccount(Account&);
-void writeToFile(Account);
+Account createAccount(Account&);
+Policy createPolicy(Policy&, Account);
+void writeAccountToFile(Account);
+void showPolicies(Account);
+void writePolicyToFile(Policy);
 bool checkUserNameExists(string);
 bool checkPassValidity(string);
-vector <Account> readFromFile();
+vector <Account> readAccountFromFile();
 void login(vector<Account>&);
 void forgotPassword();
+
+
+
+Account account;//data from the user
+vector <Account>accountFromFile;//data from the file
+
+//***********************
+//Functions
+//***********************
+
 
 //main function
 int main()
@@ -45,15 +76,14 @@ int main()
 Vehicle Insurance System
 Select an option from the menu below
 )";
-	runProgram(); //start the application, expecting user input
+	mainMenuFunctions(); //start the application, expecting user input
 }
 
 //main program operation
-void runProgram()
+void mainMenuFunctions()
 {
 	int i_menuSelection = 0;
-	Account account;//data from the user
-	vector <Account>accountFromFile;//data from the file
+
 	displayMainMenu(); //show menu
 	bool b_runProgram = true;
 
@@ -64,12 +94,12 @@ void runProgram()
 			switch (i_menuSelection)
 			{
 			case 1:
-				accountFromFile = readFromFile();
+				accountFromFile = readAccountFromFile();
 				login(accountFromFile);
 				break;
 			case 2:
-				inputAccount(account);
-				writeToFile(account);
+				createAccount(account);
+				writeAccountToFile(account);
 				break;
 			case 3:
 				displayAbout();
@@ -97,6 +127,103 @@ void runProgram()
 	cout << "Exiting application. Goodbye." << endl; //exit message
 }
 
+
+void loggedInFunctions()
+{
+	Policy policy;//data from the user
+	vector <Policy> policyFromFile;//data from the file
+	int i_menuSelection = 0;
+
+	bool b_runLoggedMenu = true;
+
+	while (b_runLoggedMenu)
+	{
+		if (cin >> i_menuSelection)
+		{
+			switch (i_menuSelection)
+			{
+			case 1:
+				cout << "Insurer details" << endl;
+				break;
+			case 2:
+				cout << "Available policies" << endl;
+				createPolicy(policy, account);
+				break;
+			case 3:
+				cout << "Submit a claim" << endl;
+				break;
+			case 4:
+				cout << "Going back to the main menu" << endl;
+				displayMainMenu();
+				b_runLoggedMenu = false;
+				break;
+			default: //validation for other numbers
+				cout << "Invalid selection." << endl;
+				cout << "Please enter one of the four numbers" << endl;
+				displayLoggedInMenu();
+				break;
+			}
+		}
+		else //validation for non numeric input
+		{
+			cout << "Invalid selection." << endl;
+			cout << "Please select one of the four numbers" << endl;
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			displayLoggedInMenu();
+		}
+	}
+}
+
+void adminFunctions()
+{
+	int i_menuSelection = 0;
+
+	bool b_runAdminMenu = true;
+
+	while (b_runAdminMenu)
+	{
+		if (cin >> i_menuSelection)
+		{
+			switch (i_menuSelection)
+			{
+			case 1:
+				cout << "Below is the list of users and their passwords" << endl;
+				break;
+			case 2:
+				cout << "Below is the list of all policies" << endl;
+				break;
+			case 3:
+				cout << "Below is a list of all claims" << endl;
+				break;
+			case 4:
+				cout << "Going back to the main menu" << endl;
+				displayMainMenu();
+				b_runAdminMenu = false;
+				break;
+			default: //validation for other numbers
+				cout << "Invalid selection." << endl;
+				cout << "Please enter one of the four numbers" << endl;
+				displayAdminMenu();
+				break;
+			}
+		}
+		else //validation for non numeric input
+		{
+			cout << "Invalid selection." << endl;
+			cout << "Please select one of the four numbers" << endl;
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			displayLoggedInMenu();
+		}
+	}
+}
+
+
+//****************************
+//Menu and Sub Menu Functions
+//****************************
+
 //displays main menu
 void displayMainMenu()
 {
@@ -104,16 +231,6 @@ void displayMainMenu()
 	cout << "2. Create new user" << endl;
 	cout << "3. About" << endl;
 	cout << "4. Exit" << endl;
-}
-
-//the result of About selection
-void displayAbout()
-{
-	cout << R"(Integrated Studio I - Assignment 2
-***********************************************
-Vehicle Insurance System
-Developed by Lana Lankevich and Saadi Radcliffe
-)";
 }
 
 //menu for Admin users - allows managing existing accounts
@@ -130,117 +247,95 @@ void displayAdminMenu()
 void displayLoggedInMenu()
 {
 	cout << endl << "1. Show insurer details" << endl;
-	cout << "2. Show car details" << endl;
-	cout << "3. Available policies" << endl;
-	cout << "4. Submit a claim" << endl;
-	cout << "5. Go back to the main menu" << endl;
+	cout << "2. Policies" << endl;
+	cout << "3. Submit a claim" << endl;
+	cout << "4. Go back to the main menu" << endl;
 	loggedInFunctions();
 }
 
-void loggedInFunctions()
+//menu to view policies and create new policies
+void displayPolicyMenu()
 {
-	int i_menuSelection = 0;
-
-	bool b_runLoggedMenu = true;
-
-	while (b_runLoggedMenu)
-	{
-		if (cin >> i_menuSelection)
-		{
-			switch (i_menuSelection)
-			{
-			case 1:
-				cout << "Insurer details" << endl;
-				break;
-			case 2:
-				cout << "Car details" << endl;
-				break;
-			case 3:
-				cout << "Available policies" << endl;
-				break;
-			case 4:
-				cout << "Submit a claim" << endl;
-				break;
-			case 5:
-				cout << "Going back to the main menu" << endl;
-				displayMainMenu();
-				b_runLoggedMenu = false;
-				break;
-			default: //validation for other numbers
-				cout << "Invalid selection." << endl;
-				cout << "Please enter one of the five numbers" << endl;
-				displayLoggedInMenu();
-				break;
-			}
-		}
-		else //validation for non numeric input
-		{
-			cout << "Invalid selection." << endl;
-			cout << "Please select one of the five numbers" << endl;
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			displayLoggedInMenu();
-		}
-	}
+	cout << endl<<  "Would you like to add a new policy? " << endl;
+	cout << "1. Yes." << endl;
+	cout << "2. No. Return to the previous menu." << endl;
 }
 
-//inputAccount to take user input
-Account inputAccount(Account& account) {
+
+//the result of About selection
+void displayAbout()
+{
+	cout << R"(Integrated Studio I - Assignment 2
+***********************************************
+Vehicle Insurance System
+Developed by Lana Lankevich and Saadi Radcliffe
+)";
+}
+
+//*************************************
+//Account Creation and Logging In
+//*************************************
+
+//create new account
+Account createAccount(Account& account) {
 	cout << "Creating a new account." << endl;
 
 	cout << "Please enter a user name: ";
-	cin >> account.username;
+	cin >> account.s_username;
 
-	while (!checkUserNameExists(account.username))
+	while (!checkUserNameExists(account.s_username))
 	{
 		cout << "Please enter a user name: ";
-		cin >> account.username;
+		cin >> account.s_username;
 	}
 
-	while (checkUserNameExists(account.username))
+	while (checkUserNameExists(account.s_username)) //check for unique user name
 	{
 		cout << "Please create a password. The password must be at least eight characters long and contain one upper case and one lower case letter: ";
-		cin >> account.password;
+		cin >> account.s_password;
 
-		while (checkPassValidity(account.password) == false) //validating for password strength requirements
+		while (checkPassValidity(account.s_password) == false) //validating for password strength requirements
 		{
 			cout << "Please enter a new password: ";
-			cin >> account.password;
+			cin >> account.s_password;
 		}
 
-		cout << "User " << account.username << " created." << endl;
+		cout << "User " << account.s_username << " created." << endl;
 		displayLoggedInMenu();
 
 		return (account);
 	}
 }
 
-//checking that the account already exists
-bool checkUserNameExists(string s_checkUserName)
+//find a password for a given user name
+void forgotPassword()
 {
-	vector <Account>accountFromFile = readFromFile();
+	string s_userName;
+	cout << "Forgot your password? Enter your user name to search for the password: ";
+	cin >> s_userName;
+	vector <Account>accountFromFile = readAccountFromFile();
 
-	for (int i = 0; i < accountFromFile.size(); i++)
+	for (int i = 0; i < accountFromFile.size(); i++) //iterate through the file looking for the user
 	{
-		if (accountFromFile[i].username == s_checkUserName)
+		if (accountFromFile[i].s_username == s_userName)
 		{
-			cout << s_checkUserName << " is already taken. Please pick a different user name." << endl;
-			return false;
+			cout << "User " << s_userName << " exists. Your password is " << accountFromFile[i].s_password << endl;
+			return;
 		}
 	}
-	return true;
+	cout << "No such user name found. Try creating a new user account." << endl;
 }
 
-//writeToFile function to store login details
-void writeToFile(Account account) {
+//writeAccountToFile function to store login details
+void writeAccountToFile(Account account) {
 
 	fstream loginDetails("loginDetails.csv", ios::app);
-	loginDetails << account.username << "," << account.password << endl;
+	loginDetails << account.s_username << "," << account.s_password << endl;
 	loginDetails.close();
 }
 
-//readFromFile function to read data from the loginDetails.csv
-vector <Account> readFromFile() {
+//readAccountFromFile function to read data from the loginDetails.csv
+vector <Account> readAccountFromFile() {
 
 	fstream loginDetails("loginDetails.csv", ios::in);
 	vector<Account> tempAccount;
@@ -253,10 +348,10 @@ vector <Account> readFromFile() {
 		string item;
 		//until the appearance of comma, everything is stored in item
 		getline(linestream, item, ',');
-		a.username = item;
+		a.s_username = item;
 
 		getline(linestream, item, ',');
-		a.password = item;
+		a.s_password = item;
 
 		tempAccount.push_back(a);
 	}
@@ -280,12 +375,12 @@ void login(vector<Account>& accountFromFile) {
 
 		for (int i = 0; i < accountFromFile.size(); i++)
 		{
-			if (accountFromFile[i].username == s_uname && accountFromFile[i].password == s_upassword)
+			if (accountFromFile[i].s_username == s_uname && accountFromFile[i].s_password == s_upassword)
 			{
 				cout << s_uname << " logged in" << endl;
 				if (s_uname == "Admin")
 					displayAdminMenu();
-				else 
+				else
 					displayLoggedInMenu();
 				i_loggedIn = 1;
 				return; //we are now logged in so return out of this function
@@ -310,23 +405,25 @@ void login(vector<Account>& accountFromFile) {
 	displayMainMenu();
 }
 
-//find a password for a given user name
-void forgotPassword()
-{
-	string s_userName;
-	cout << "Forgot your password? Enter your user name to search for the password: ";
-	cin >> s_userName;
-	vector <Account>accountFromFile = readFromFile();
 
-	for (int i = 0; i < accountFromFile.size(); i++) //iterate through the file looking for the user
+//***********************
+//Validation Functions
+//***********************
+
+//checking that the account already exists
+bool checkUserNameExists(string s_checkUserName)
+{
+	vector <Account>accountFromFile = readAccountFromFile();
+
+	for (int i = 0; i < accountFromFile.size(); i++)
 	{
-		if (accountFromFile[i].username == s_userName)
+		if (accountFromFile[i].s_username == s_checkUserName)
 		{
-			cout << "User " << s_userName << " exists. Your password is " << accountFromFile[i].password << endl;
-			return;
+			cout << s_checkUserName << " is already taken. Please pick a different user name." << endl;
+			return false;
 		}
 	}
-	cout << "No such user name found. Try creating a new user account." << endl;
+	return true;
 }
 
 //checks for password strength requirements
@@ -353,46 +450,129 @@ bool checkPassValidity(string p)
 	return false;
 }
 
-void adminFunctions()
-{
+//****************************
+//Logged In Functions
+//****************************
+
+
+//create a new Policy
+Policy createPolicy(Policy& policy, Account account) {
 	int i_menuSelection = 0;
 
-	bool b_runLoggedMenu = true;
+	bool b_policyMenu = true;
 
-	while (b_runLoggedMenu)
+	cout << "You currently have the following policies. " << endl;
+	showPolicies(account);
+
+	displayPolicyMenu();
+
+	cin >> i_menuSelection;
+
+	while (b_policyMenu)
 	{
 		if (cin >> i_menuSelection)
 		{
 			switch (i_menuSelection)
 			{
 			case 1:
-				cout << "Below is the list of users and their passwords" << endl;
+				cout << "activating case 1" << endl; //testing line
+				policy.s_username = account.s_username;
+				cout << "please enter your car make: ";
+				cin >> policy.s_carMake;
+				cout << "please enter your car model: ";
+				cin >> policy.s_carModel;
+				cout << "please enter your car year of manufacture: ";
+				cin >> policy.s_carYear;
+				cout << "please enter the value you'd like to ensure your car for: ";
+				cin >> policy.s_insuredValue;
+				writePolicyToFile(policy);
+				displayPolicyMenu();
 				break;
 			case 2:
-				cout << "Below is the list of all policies" << endl;
-				break;
-			case 3:
-				cout << "Below is a list of all claims" << endl;
-				break;
-			case 4:
-				cout << "Going back to the main menu" << endl;
-				displayMainMenu();
-				b_runLoggedMenu = false;
+				cout << "Going back to the previous menu" << endl;
+				b_policyMenu = false;
+				displayLoggedInMenu();
 				break;
 			default: //validation for other numbers
 				cout << "Invalid selection." << endl;
-				cout << "Please enter one of the five numbers" << endl;
-				displayAdminMenu();
+				cout << "Please enter one of the two numbers" << endl;
+				displayPolicyMenu();
 				break;
 			}
 		}
 		else //validation for non numeric input
 		{
 			cout << "Invalid selection." << endl;
-			cout << "Please select one of the five numbers" << endl;
+			cout << "Please select one of the two numbers" << endl;
 			cin.clear();
 			cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			displayLoggedInMenu();
+			displayPolicyMenu();
 		}
 	}
+	return (policy);
+}
+
+//writePolicyToFile function to store policy details
+void writePolicyToFile(Policy policy) {
+
+	fstream policyDetails("policyDetails.csv", ios::app);
+	policyDetails << policy.s_username << "," << policy.s_carMake << "," << policy.s_carModel << "," << policy.s_carYear << "," << policy.s_insuredValue << endl;
+	policyDetails.close();
+}
+
+//readPolicyFromFile function to read data from the policyDetails.csv
+vector <Policy> readPolicyFromFile() {
+
+	fstream policyDetails("policyDetails.csv", ios::in);
+	vector<Policy> tempPolicy;
+
+	Policy p;
+	string line;
+	while (getline(policyDetails, line)) {
+
+		istringstream linestream(line);//to split the row into columns/properties
+		string s_item;
+
+		//until the appearance of comma, everything is stored in item
+		getline(linestream, s_item, ',');
+		p.s_username = s_item;
+
+		getline(linestream, s_item, ',');
+		p.s_carMake = s_item;
+
+		getline(linestream, s_item, ',');
+		p.s_carModel = s_item;
+
+		getline(linestream, s_item, ',');
+		p.s_carYear = s_item;
+
+		getline(linestream, s_item, ',');
+		p.s_insuredValue = s_item;
+
+		tempPolicy.push_back(p);
+	}
+	policyDetails.close();
+	return(tempPolicy);
+}
+
+//show all policies for a given user name
+void showPolicies(Account account)
+{
+	string s_userName;
+	s_userName = account.s_username;
+	vector <Policy> policyFromFile = readPolicyFromFile();
+
+	for (int i = 0; i < policyFromFile.size(); i++) //iterate through the file listing all policies
+	{
+		if (account.s_username == s_userName)
+		{
+			cout << "Policies for " << s_userName << endl;
+			cout << "Car Make " << policyFromFile[i].s_carMake;
+			cout << "Car Model " << policyFromFile[i].s_carModel;
+			cout << "Car Year " << policyFromFile[i].s_carYear;
+			cout << "Insured Value " << policyFromFile[i].s_insuredValue;
+			return;
+		}
+	}
+	cout << "No policies found." << endl;
 }
