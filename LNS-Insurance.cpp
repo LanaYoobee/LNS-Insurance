@@ -142,6 +142,7 @@ void mainMenuFunctions()
 				displayMainMenu();
 				break;
 			case 4:
+				cout << "Exiting application. Goodbye." << endl; //exit message
 				b_runProgram = false; //false so let's get out of here
 				return;
 			default:
@@ -160,7 +161,7 @@ void mainMenuFunctions()
 			displayMainMenu();
 		}
 	}
-	cout << "Exiting application. Goodbye." << endl; //exit message
+	
 }
 
 
@@ -182,11 +183,9 @@ void loggedInFunctions()
 				break;
 			case 2:
 				viewPolicies();
-				displayLoggedInMenu();
 				break;
 			case 3:
 				viewClaims();
-				displayLoggedInMenu();
 				break;
 			case 4:
 				cout << "Going back to the main menu" << endl;
@@ -554,6 +553,7 @@ void viewPolicies() {
 				break;
 			case 2:
 				cout << "Going back to the previous menu" << endl;
+				displayLoggedInMenu();
 				b_policyMenu = false;
 				return;
 			default: //validation for other numbers
@@ -735,15 +735,16 @@ void viewClaims() {
 				createClaim(s_loggedInUser);
 				writeClaimToFile(claim);
 				displayClaimMenu();
-				return;
+				break;
 			case 2:
 				cout << "Going back to the previous menu" << endl;
+				displayLoggedInMenu();
 				b_claimMenu = false;
 				return;
 			default: //validation for other numbers
 				cout << "Invalid selection." << endl;
 				cout << "Please enter one of the two numbers" << endl;
-				displayPolicyMenu();
+				displayClaimMenu();
 				break;
 			}
 		}
@@ -753,7 +754,7 @@ void viewClaims() {
 			cout << "Please select one of the two numbers" << endl;
 			cin.clear();
 			cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			displayPolicyMenu();
+			displayClaimMenu();
 		}
 	}
 }
