@@ -58,25 +58,34 @@ void displayPolicyMenu();
 void displayLoggedInMenu();
 void displayAdminMenu();
 
-void loggedInFunctions();
-void adminFunctions();
 Account createAccount(Account&);
-void viewPolicies();
-void viewClaims();
+Policy createPolicy(string);
+Claim createClaim(string);
+
 void writeAccountToFile(Account);
 void writePolicyToFile(Policy);
-void showPolicyDetails(string);
-void showClaimDetails(string);
-Policy createPolicy(string);
-bool checkUserNameExists(string);
-bool checkPassValidity(string);
+void writeClaimToFile(Claim);
+
 vector <Account> readAccountFromFile();
 vector <Policy> readPolicyFromFile();
 vector <Claim> readClaimFromFile();
+
 void login(vector<Account>&);
+
+void loggedInFunctions();
+
+void showPolicyDetails(string);
+void showClaimDetails(string);
+
+void viewPolicies();
+void viewClaims();
+
+bool checkUserNameExists(string);
+bool checkPassValidity(string);
 void forgotPassword();
-Claim createClaim(string);
-void writeClaimToFile(Claim);
+
+void adminFunctions();
+void viewUsers();
 
 Account account;//data from the user
 vector <Account> accountFromFile;//data from the file
@@ -124,6 +133,9 @@ void mainMenuFunctions()
 			case 2:
 				createAccount(account);
 				writeAccountToFile(account);
+				accountFromFile = readAccountFromFile();
+				cout << endl << "Please log in" << endl;
+				login(accountFromFile);
 				break;
 			case 3:
 				displayAbout();
@@ -212,7 +224,8 @@ void adminFunctions()
 			switch (i_menuSelection)
 			{
 			case 1:
-				cout << "Below is the list of users and their passwords" << endl;
+				viewUsers();
+				displayAdminMenu();
 				break;
 			case 2:
 				showPolicyDetails(s_loggedInUser);
@@ -262,9 +275,9 @@ void displayMainMenu()
 //menu for Admin users - allows managing existing accounts
 void displayAdminMenu()
 {
-	cout << endl << "1. Manage users" << endl;
-	cout << "2. Manage policies" << endl;
-	cout << "3. Manage claims" << endl;
+	cout << endl << "1. View all users" << endl;
+	cout << "2. View all policies" << endl;
+	cout << "3. View all claims" << endl;
 	cout << "4. Go back to the main menu" << endl;
 }
 
@@ -292,7 +305,6 @@ void displayClaimMenu()
 	cout << "1. Yes." << endl;
 	cout << "2. No. Return to the previous menu." << endl;
 }
-
 
 
 //the result of About selection
@@ -344,7 +356,6 @@ Account createAccount(Account& account) {
 		}
 
 		cout << "User " << account.s_username << " created." << endl;
-		displayLoggedInMenu();
 
 		return (account);
 	}
@@ -367,6 +378,21 @@ void forgotPassword()
 		}
 	}
 	cout << "No such user name found. Try creating a new user account." << endl;
+}
+
+//find a password for a given user name
+void viewUsers()
+{
+	vector <Account>accountFromFile = readAccountFromFile();
+
+	cout << "Below is the list of all existing users" << endl;
+
+	for (int i = 0; i < accountFromFile.size(); i++) //iterate through the file 
+	{
+				cout << endl << "User Name: "<< accountFromFile[i].s_username << endl;
+				cout << "Password: " << accountFromFile[i].s_password << endl;
+			}
+			return;
 }
 
 //writeAccountToFile function to store login details
@@ -615,7 +641,7 @@ void showPolicyDetails(string s_loggedInUser)
 
 	for (int i = 0; i < policyFromFile.size(); i++)
 	{
-		if (s_loggedInUser == "Admin")
+		if (s_loggedInUser == "Admin") // separate use case for an Admin account - to show all claims
 		{
 			cout << "Below is the list of all existing policies" << endl;
 			for (int i = 0; i < policyFromFile.size(); i++) //iterate through the file listing all policies for all users
@@ -753,12 +779,15 @@ Claim createClaim(string s_loggedInUser) {
 }
 
 // writeClaimToFile function to store claim details
-void writeClaimToFile(Claim claim) {
+void writeClaimToFile(Claim claim) 
+{
 
 	fstream claimDetails("claimDetails.csv", ios::app);
 	claimDetails << claim.s_username << "," << claim.s_policyID << "," << claim.s_claimType << "," << claim.s_claimStatus << endl;
 	claimDetails.close();
 }
+
+
 
 //show all claims for a given user name
 void showClaimDetails(string s_loggedInUser)
@@ -773,12 +802,14 @@ void showClaimDetails(string s_loggedInUser)
 			cout << "Below is the list of all existing claims" << endl;
 			for (int i = 0; i < claimFromFile.size(); i++) //iterate through the file listing all claims for all users
 			{
-				cout << endl << "User " << claimFromFile[i].s_username << endl;
-				cout << endl << "Policy ID " << claimFromFile[i].s_policyID << endl;
-				cout << "Car Make " << claimFromFile[i].s_claimType << endl;
-				cout << "Car Model " << claimFromFile[i].s_claimStatus << endl;
+				cout << endl << "Claim ID " << i << endl;
+				cout << "User " << claimFromFile[i].s_username << endl;
+				cout << "Policy ID " << claimFromFile[i].s_policyID << endl;
+				cout << "Claim Type " << claimFromFile[i].s_claimType << endl;
+				cout << "Claim Status " << claimFromFile[i].s_claimStatus << endl;
 
 			}
+			
 			return;
 		}
 		else if (claimFromFile[i].s_username == s_loggedInUser)
@@ -790,8 +821,8 @@ void showClaimDetails(string s_loggedInUser)
 
 				{
 					cout << endl << "Policy ID " << claimFromFile[i].s_policyID << endl;
-					cout << "Car Make " << claimFromFile[i].s_claimType << endl;
-					cout << "Car Model " << claimFromFile[i].s_claimStatus << endl;
+					cout << "Claim Type " << claimFromFile[i].s_claimType << endl;
+					cout << "Claim Status " << claimFromFile[i].s_claimStatus << endl;
 				}
 			}
 			return;
